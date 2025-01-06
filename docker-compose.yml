@@ -1,0 +1,30 @@
+services:
+  postgres:
+    container_name: postgres-sql-bsn
+    image: postgres
+    environment:
+      POSTGRES_USER: gusain
+      POSTGRES_PASSWORD: gusain
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_DB: boook_social_network
+    volumes:
+      - postgres:/data/progres
+    ports:
+      - 5432:5432
+    networks:
+      - spring-fullstack
+    restart: unless-stopped
+
+  mail-dev:
+    container_name: mail-dev-bsn
+    image: maildev/maildev
+    ports:
+      - 1080:1080
+      - 1025:1025
+
+volumes:
+  postgres:
+    driver: local
+networks:
+  spring-fullstack:
+    driver: bridge
