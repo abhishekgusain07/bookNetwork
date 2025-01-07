@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "book network ",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

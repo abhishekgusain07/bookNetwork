@@ -50,7 +50,7 @@ public class AuthenticationService {
 
     private void sendValidationEmail(User user) throws MessagingException {
         var newToken = generateAndSaveActivationToken(user);
-
+        System.out.println(newToken);
         //send mail
         emailService.sendEmail(
                 user.getEmail(),
