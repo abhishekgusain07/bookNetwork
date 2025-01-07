@@ -112,7 +112,7 @@ public class AuthenticationService {
                 .build();
     }
 
-    @Transactional
+
     public void activateToken(String token) throws MessagingException {
         Token savedToken = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new IllegalStateException("Invalid token"));
