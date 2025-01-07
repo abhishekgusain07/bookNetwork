@@ -1,11 +1,15 @@
 package com.gusain.book.auth;
 
+import com.gusain.book.email.EmailService;
+import com.gusain.book.email.EmailTemplateName;
 import com.gusain.book.role.RoleRepository;
 import com.gusain.book.user.Token;
 import com.gusain.book.user.TokenRepository;
 import com.gusain.book.user.User;
 import com.gusain.book.user.UserRepository;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +25,12 @@ public class AuthenticationService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenRepository tokenRepository;
+    private final EmailService emailService;
 
-    public void register(RegistrationRequest request) {
+    @Value("${application.security.mailing.frontend.activation-url}")
+    private  String activationUrl;
+
+    public void register(RegistrationRequest request) throws MessagingException {
              var userRole = roleRepository.findByName("USER").orElseThrow(() -> new IllegalStateException("Role USER not found"));
              var user = User.builder()
                      .firstname(request.getFirstname())
@@ -40,10 +48,18 @@ public class AuthenticationService {
 
     }
 
-    private void sendValidationEmail(User user) {
+    private void sendValidationEmail(User user) throws MessagingException {
         var newToken = generateAndSaveActivationToken(user);
 
         //send mail
+        emailService.sendEmail(
+                user.getEmail(),
+                user.fullName(),
+                EmailTemplateName.ACTIVATE_ACCOUNT,
+                activationUrl,
+                newToken,
+                "Account Activation"
+        );
     }
 
     private String generateAndSaveActivationToken(User user) {
