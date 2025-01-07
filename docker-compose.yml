@@ -6,9 +6,9 @@ services:
       POSTGRES_USER: gusain
       POSTGRES_PASSWORD: gusain
       PGDATA: /var/lib/postgresql/data
-      POSTGRES_DB: boook_social_network
+      POSTGRES_DB: book_social_network
     volumes:
-      - postgres:/data/progres
+      - postgres:/data/postgres
     ports:
       - 5432:5432
     networks:

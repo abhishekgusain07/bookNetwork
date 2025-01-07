@@ -1,0 +1,45 @@
+
+When you write spring.profiles.active=dev in your application.yml file, it means you're telling Spring Boot to activate the "dev" (development) profile by default when the application starts up. This is part of Spring's profiles feature, which allows you to have different configurations for different environments.
+Here's what it specifically does:
+
+Spring Boot will look for configuration properties marked with the "dev" profile
+It will load any configuration files named application-dev.yml or application-dev.properties
+It will activate any beans annotated with @Profile("dev")
+
+For example, if you have:
+yamlCopy# application.yml
+spring:
+  profiles:
+    active: dev
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://localhost:3306/devdb
+    username: devuser
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:mysql://production-server:3306/proddb
+    username: produser
+When your application starts, it will use the database configuration under the "dev" profile (connecting to localhost) rather than the production configuration.
+This is particularly useful for maintaining different configurations for:
+
+Database connections
+External service endpoints
+Logging levels
+Security settings
+Cache configurations
+
+================
+If you don't specify spring.profiles.active=dev in your application.yml, the application-dev.yml file will not load by default. Here's how it works:
+
+By default, Spring Boot only loads the base application.yml (or application.properties) file
+Profile-specific files like application-dev.yml are only loaded when their corresponding profile is activated

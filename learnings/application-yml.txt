@@ -1,0 +1,21 @@
+1. servelet.multipart.max-file-size
+    servlet.multipart.max-file-size: 50MB
+
+    Sets the maximum size of a single file that can be uploaded
+    In this case, files larger than 50 megabytes will be rejected
+    If a user tries to upload a 51MB file, they'll get a MultipartException
+
+2. springdoc
+    default-produces-media-type: application/json specifies that all API endpoints by default will produce JSON responses
+    This affects the OpenAPI documentation and Swagger UI
+    When someone calls your API endpoints, the response will have Content-Type: application/json header
+
+3. server.servlet.context-path
+    This sets up the base URL path for your entire application:
+
+    context-path: /api/v1/ means all your endpoints will be prefixed with /api/v1/
+    For example:
+
+    If you have @GetMapping("/users"), the actual URL will be /api/v1/users
+    If you have @PostMapping("/auth/login"), it becomes /api/v1/auth/login
+
