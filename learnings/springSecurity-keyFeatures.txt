@@ -1,0 +1,57 @@
+Key Components and Their Roles:
+
+SecurityConfig:
+
+
+Entry point for security configuration
+Defines security rules and policies
+Configures authentication provider
+Sets up JWT filter
+Manages public/protected URLs
+
+
+JwtFilter:
+
+
+Intercepts all incoming requests
+Validates JWT tokens
+Manages token-based authentication
+Sets up security context
+Handles authorization header processing
+
+
+UserDetailsServiceImpl:
+
+
+Loads user data from database
+Converts database user to Spring Security UserDetails
+Provides user information for authentication
+Handles username/password verification
+
+
+JwtService (mentioned in code):
+
+
+Generates JWT tokens
+Validates tokens
+Extracts user information from tokens
+Manages token expiration
+
+Typical Request Flow:
+
+Client sends request with JWT in Authorization header
+JwtFilter intercepts request
+Filter extracts and validates token
+If valid, loads user details
+Sets authentication in security context
+Request proceeds to protected resource
+If invalid, returns 401 Unauthorized
+
+Security Features Implemented:
+
+Stateless authentication (JWT)
+Method-level security (@EnableMethodSecurity)
+Protected endpoints requiring authentication
+Public endpoints for auth and documentation
+CSRF protection (disabled for stateless auth)
+Custom user details service

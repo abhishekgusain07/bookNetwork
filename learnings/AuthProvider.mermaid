@@ -1,0 +1,27 @@
+sequenceDiagram
+    participant C as Client
+    participant AM as AuthenticationManager
+    participant AP as AuthenticationProvider
+    participant UDS as UserDetailsService
+    participant PE as PasswordEncoder
+    participant DB as Database
+
+    C->>AM: Authentication Request
+    AM->>AP: Authenticate
+
+    AP->>UDS: Load User Details
+    UDS->>DB: Query User
+    DB-->>UDS: User Data
+    UDS-->>AP: UserDetails
+
+    AP->>PE: Match Password
+    Note over PE: Compare submitted password<br/>with encoded password
+    PE-->>AP: Password Match Result
+
+    alt Authentication Success
+        AP-->>AM: Authenticated Token
+        AM-->>C: Authentication Success
+    else Authentication Failure
+        AP-->>AM: AuthenticationException
+        AM-->>C: Authentication Failure
+    end

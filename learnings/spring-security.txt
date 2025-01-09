@@ -1,0 +1,57 @@
+the flow of Spring Security
+
+1. SecurityConfig:
+   This is the central configuration class for security settings:
+
+   @Configuration
+   @EnableWebSecurity
+   @EnableMethodSecurity(securedEnabled = true)
+   public class SecurityConfig {
+       // Configuration here
+   }
+   Key aspects:
+
+   Configures which URLs are public vs protected
+   Sets up the security filter chain
+   Configures JWT authentication
+   Handles CORS and CSRF settings
+
+   The SecurityFilterChain bean defines the security rules:
+   javaCopy.authorizeHttpRequests(req ->
+       req.requestMatchers(
+           "/auth/**",  // Public endpoints
+           "/swagger-ui/**"  // Documentation endpoints
+       ).permitAll()
+       .anyRequest()    // All other endpoints
+       .authenticated() // Require authentication
+   )
+====================================================================================================
+2. JwtFilter:
+   This filter intercepts every HTTP request to validate JWT tokens:
+
+   @Service
+   public class JwtFilter extends OncePerRequestFilter {
+       // Filter implementation
+   }
+   The authentication flow in the filter:
+
+   Extracts JWT from Authorization header -> Validates the token -> Loads user details -> Sets authentication in SecurityContext
+
+   Request → JwtFilter → Extract Token → Validate → Load User → Set Authentication → Continue
+
+====================================================================================================
+
+3. UserDetailsServiceImpl:
+   Loads user data from the database for authentication:
+
+   javaCopy@Service
+   public class UserDetailsServiceImpl implements UserDetailsService {
+       @Override
+       public UserDetails loadUserByUsername(String username) {
+           // Load user from database
+       }
+   }
+
+====================================================================================================
+
+4.
