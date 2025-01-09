@@ -1,6 +1,8 @@
 package com.gusain.book.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gusain.book.book.Book;
+import com.gusain.book.history.BookTransactionHIstory;
 import com.gusain.book.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -44,6 +46,12 @@ public class User implements UserDetails, Principal {
     @ManyToMany(fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Role> roles;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Book> books;
+
+    @OneToMany(mappedBy = "user")
+    private List<BookTransactionHIstory> histories;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
