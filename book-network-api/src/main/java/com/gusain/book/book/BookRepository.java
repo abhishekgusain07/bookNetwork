@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface BookRepository  extends JpaRepository<Book, Integer>, JpaSpecificationExecutor<Book> {
     @Query("""
@@ -13,6 +14,6 @@ public interface BookRepository  extends JpaRepository<Book, Integer>, JpaSpecif
         AND  b.shareable = true
         AND b.owner.id != :userId
 """)
-    Page<Book> findAllDisplayableBook(Pageable pageable, Integer userId);
+    Page<Book> findAllDisplayableBook(Pageable pageable,@Param("userId") Integer userId);
 
 }

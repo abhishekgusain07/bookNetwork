@@ -1,5 +1,6 @@
 package com.gusain.book.book;
 
+import com.gusain.book.history.BookTransactionHIstory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,6 +31,18 @@ public class BookMapper {
                 .archived(book.isArchived())
                 .owner(book.getOwner().fullName())
                 .rate(book.getRate())
+                .build();
+    }
+
+    public BorrowedBookResponse toBorrowedBookResponse(BookTransactionHIstory history) {
+        return BorrowedBookResponse.builder()
+                .id(history.getBook().getId())
+                .title(history.getBook().getTitle())
+                .authorName(history.getBook().getAuthorName())
+                .isbn(history.getBook().getIsbn())
+                .rate(history.getBook().getRate())
+                .returnApproved(history.isReturnApproved())
+                .returned(history.isReturned())
                 .build();
     }
 }
