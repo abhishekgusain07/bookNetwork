@@ -1,5 +1,6 @@
 package com.gusain.book.book;
 
+import com.gusain.book.common.PageResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,4 +36,14 @@ public class BookController {
     public ResponseEntity<List<BookResponse>> getAllBooks() {
         return ResponseEntity.ok(service.findAllBooks());
     }
+
+    @GetMapping("/paging")
+    public ResponseEntity<PageResponse<BookResponse>> findAllBooks(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size,
+            Authentication connectedUser
+    ) {
+        return ResponseEntity.ok(service.findAllBooks(page, size, connectedUser));
+    }
+
 }

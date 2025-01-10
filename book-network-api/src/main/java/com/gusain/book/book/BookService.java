@@ -1,8 +1,13 @@
 package com.gusain.book.book;
 
+import com.gusain.book.common.PageResponse;
 import com.gusain.book.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -35,4 +40,23 @@ public class BookService {
                 .map(bookMapper::fromBook)
                 .collect(Collectors.toList());
     }
+
+    public PageResponse<BookResponse> findAllBooks(int page, int size, Authentication connectedUser) {
+        User user = ((User)connectedUser.getPrincipal());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
+        Page<Book> books = bookRepository.findAllDisplayableBook(pageable, user.getId());
+        List<BookResponse> bookResponses = books.stream()
+                .map(bookMapper::fromBook)
+                .toList();
+        return new PageResponse<BookResponse>(
+                bookResponses,
+                books.getNumber(),
+                books.getSize(),
+                books.getTotalElements(),
+                books.getTotalPages(),
+                books.isFirst(),
+                books.isLast()
+        );
+    }
+
 }
