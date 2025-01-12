@@ -1,7 +1,9 @@
 package com.gusain.book.book;
 
 import com.gusain.book.common.PageResponse;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.Multipart;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -109,5 +111,20 @@ public class BookController {
             Authentication connectedUser
     ){
         return ResponseEntity.ok(service.approveReturn(bookId, connectedUser));
+    }
+
+    @PostMapping(
+            value = "/cover/{book-id}",
+            consumes = "multipart/form-data"
+    )
+    public ResponseEntity<?> uploadBookCover(
+            @PathVariable("book-id") Integer bookId,
+            @Parameter()
+            @RequestPart("file") Multipart file,
+            Authentication connectedUser
+    ){
+        service.uploadCover(bookId, file,
+                connectedUser);
+        return ResponseEntity.accepted().build();
     }
 }

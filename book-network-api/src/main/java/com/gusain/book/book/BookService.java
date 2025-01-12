@@ -2,9 +2,11 @@ package com.gusain.book.book;
 
 import com.gusain.book.common.PageResponse;
 import com.gusain.book.exception.OperationNotPermittedException;
+import com.gusain.book.file.FileStorageService;
 import com.gusain.book.history.BookTransactionHIstory;
 import com.gusain.book.history.BookTransactionHistoryRepository;
 import com.gusain.book.user.User;
+import jakarta.mail.Multipart;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +29,7 @@ public class BookService {
     private final BookMapper bookMapper;
     private final BookRepository bookRepository;
     private final BookTransactionHistoryRepository bookTransactionRepo;
+    private final FileStorageService fileStorageService;
 
     public Integer saveBook(BookRequest request, Authentication connectedUser) {
 
@@ -219,5 +223,15 @@ public class BookService {
         history.setReturnApproved(true);
 
         return bookTransactionRepo.save(history).getId();
+    }
+
+    public void uploadCover(Integer bookId, MultipartFile file, Authentication connectedUser) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("Book not found with Id:: "+bookId));
+        User user = ((User)connectedUser.getPrincipal());
+
+        var bookCover = fileStorageService.saveFile(file, user.getId());
+        book.setBookCover(bookCover);
+        bookRepository.save(book);
     }
 }
