@@ -6,6 +6,7 @@ import com.gusain.book.history.BookTransactionHIstory;
 import com.gusain.book.history.BookTransactionHistoryRepository;
 import com.gusain.book.user.User;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -168,5 +169,55 @@ public class BookService {
                 .returnApproved(false)
                 .build();
         return bookTransactionRepo.save(bookTransactionHIstory).getId();
+    }
+
+    public Integer returnBook(Authentication connectedUser, Integer bookId) {
+        User user = ((User)connectedUser.getPrincipal());
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundException("Book not found with Id:: "+bookId));
+
+        if(book.isArchived() || !book.isShareable()) {
+            throw new OperationNotPermittedException("The request book cannot be returned");
+        }
+
+        if(!Objects.equals(user.getId(), book.getOwner().getId())) {
+            throw new OperationNotPermittedException("You cannot borrow or return your own book");
+        }
+        final boolean isAlreadyBorrowedByOtherUser = bookTransactionRepo.isAlreadyBorrowed(bookId);
+        if(isAlreadyBorrowedByOtherUser) {
+            throw new OperationNotPermittedException("The request book is borrowed by some other person");
+        }
+
+        //check if this book is currently borrowed
+        final boolean isAlreadyBorrowedByUser = bookTransactionRepo.isAlreadyBorrowedByUser(bookId, user.getId());
+        if(!isAlreadyBorrowedByUser) {
+            throw new OperationNotPermittedException("The Requested Book is not borrowed by you");
+        }
+
+        BookTransactionHIstory history = bookTransactionRepo.findByBookIdAndUserId(bookId, user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("you did not borrow this book"));
+        history.setReturned(true);
+        return bookTransactionRepo.save(history).getId();
+    }
+
+    public Integer approveReturn(Integer bookId, Authentication connectedUser) {
+        User user = ((User)connectedUser.getPrincipal());
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundException("Book not found with Id:: "+bookId));
+
+        if(book.isArchived() || !book.isShareable()) {
+            throw new OperationNotPermittedException("The request book cannot be returned");
+        }
+
+        //check if book belongs to the user
+        if(!Objects.equals(user.getId(), book.getOwner().getId())) {
+            throw new OperationNotPermittedException("Cannot approve return of someone else's book");
+        }
+
+        //not archived and shareable
+        BookTransactionHIstory history = bookTransactionRepo.findReturnedBookWithOwnerIdAndBookId(bookId, user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("The Book is not returned yet, so you cannot approve the return ."));
+
+        history.setReturnApproved(true);
+
+        return bookTransactionRepo.save(history).getId();
     }
 }
