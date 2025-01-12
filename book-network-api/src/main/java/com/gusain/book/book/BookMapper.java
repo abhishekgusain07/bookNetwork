@@ -1,5 +1,6 @@
 package com.gusain.book.book;
 
+import com.gusain.book.file.FileUtils;
 import com.gusain.book.history.BookTransactionHIstory;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +27,7 @@ public class BookMapper {
                 .synopsis(book.getSynopsis())
                 .isbn(book.getIsbn())
                 .shareable(book.isShareable())
-                //TODO: implement cover for book
-//                .cover()
+                .cover(FileUtils.readFileFromLocation(book.getBookCover()))
                 .archived(book.isArchived())
                 .owner(book.getOwner().fullName())
                 .rate(book.getRate())
